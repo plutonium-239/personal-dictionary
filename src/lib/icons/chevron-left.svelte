@@ -1,0 +1,5 @@
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg class="{$$props.class}" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>chevron-left</title>
+  <polygon points="15.3 23.9 3.4 12 15.3 0.1 18.2 2.9 9.1 12 18.2 21.1 15.3 23.9"/>
+</svg>
