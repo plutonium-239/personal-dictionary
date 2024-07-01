@@ -12,8 +12,8 @@
 	import POS from "./table-elements/POS.svelte"
 	import { data } from "./store"
 	import Actions from "./table-elements/Actions.svelte"
-	import { filteredOptions, loadWordList, search20, words } from "./load_wordlist"
-	import { ThemeInit } from "svelte-ux"
+	import { _search20, filteredOptions, loadWordList, search20, words } from "./load_wordlist"
+	import { debounceEvent, ThemeInit } from "svelte-ux"
 	import Word from "./table-elements/Word.svelte"
 	import Synonyms from "./table-elements/Synonyms.svelte"
 
@@ -70,9 +70,9 @@
 		console.log(newWord)
 	}
 	let listedOptions: AutocompleteOption[] = []
-	$: search20(newWord).then((options) => {
-		listedOptions = options
-	})
+	// $: search20(newWord).then((options) => {
+	// 	listedOptions = options
+	// })
 	// $: {
 	// 	listedOptions.push({label: "start", value: "start"})
 	// 	listedOptions = listedOptions
@@ -151,6 +151,13 @@
 		type="text"
 		class="word-input bg-primary-50/75 dark:bg-primary-900/75 placeholder:text-secondary"
 		bind:value={newWord}
+		use:debounceEvent={{
+			type: "input",
+			listener: () => {
+				listedOptions = _search20(newWord)
+			},
+			timeout: 200,
+		}}
 	/>
 	<!-- on:input={() => search20(newWord)} -->
 	<!-- <Autocomplete 
