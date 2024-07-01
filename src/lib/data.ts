@@ -1,26 +1,9 @@
+export let totalWords: number
+
 class SingleDefinition {
 	constructor(public definition: string, public example: string = "") {}
 	static makefrom(obj: any): SingleDefinition {
 		return new SingleDefinition(obj.definition, obj.example)
-	}
-}
-
-class POSDefinition {
-	constructor(
-		public partOfSpeech: string,
-		public definitions: SingleDefinition[],
-		public synonyms: string[],
-		public antonyms: string[],
-		public selectedDefinition: number = 0
-	) {}
-	static makefrom(obj: any): POSDefinition {
-		return new POSDefinition(
-			obj.partOfSpeech,
-			obj.definitions.map((def: any) => SingleDefinition.makefrom(def)),
-			obj.synonyms,
-			obj.antonyms,
-			obj.selectedDefinition ? obj.selectedDefinition : 0
-		)
 	}
 }
 
@@ -53,6 +36,7 @@ class Meanings {
 
 export class WordData {
 	constructor(
+		public index: number,
 		public word: string,
 		public dateAdded: number,
 		public fetched: boolean = false,
@@ -63,6 +47,7 @@ export class WordData {
 	) {}
 	static makefrom(obj: any): WordData {
 		return new WordData(
+			obj.index,
 			obj.word,
 			obj.dateAdded,
 			obj.fetched,
@@ -78,18 +63,20 @@ export class WordData {
 export function loadData() {
 	const storedData = localStorage.getItem("wordsData")
 	var parsedWords: WordData[] = []
-	console.log("storedData")
-	console.log(storedData)
+	// console.log("storedData")
+	// console.log(storedData)
 	if (storedData !== null) {
 		JSON.parse(storedData).forEach((element: any) => {
 			parsedWords.push(WordData.makefrom(element))
-			console.log("parsedWords")
-			console.log(parsedWords)
+			// console.log("parsedWords")
+			// console.log(parsedWords)
 		})
 	} else {
-		parsedWords.push(new WordData("personal", 0))
+		// totalWords is 0
+		parsedWords.push(new WordData(totalWords, "personal", 0))
 	}
-
+	totalWords = parsedWords.length
+	console.log(`totalWords ${totalWords}`)
 	return Promise.all(parsedWords.map((word) => updateMeanings(word)))
 
 	// var newParsedWords: WordData[] = parsedWords;
@@ -106,19 +93,20 @@ export function loadData() {
 // Function to save data to localStorage
 export function saveData(newData: Array<WordData>) {
 	if (newData.length == 0) {
-		console.log("not saving - got empty newdata")
+		// console.log("not saving - got empty newdata")
 		return
 	}
-	console.log("saving...")
-	console.log(newData)
+	totalWords = newData.length
+	console.log(`saving... total=${totalWords}`)
+	// console.log(newData)
 	localStorage.setItem("wordsData", JSON.stringify(newData))
 }
 
 export function updateMeanings(word: WordData) {
-	console.log("update called with")
-	console.log(word)
+	// console.log("update called with")
+	// console.log(word)
 	if (word.fetched) {
-		console.log("skip fetch")
+		// console.log("skip fetch")
 		return Promise.resolve(word)
 	}
 	return fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.word}`)
@@ -129,7 +117,7 @@ export function updateMeanings(word: WordData) {
 			return res.json()
 		})
 		.then((data) => {
-			console.log(data)
+			// console.log(data)
 			// word.meanings = data[0].meanings.map((pos: any) => POSDefinition.makefrom(pos))
 			// word.meanings =
 			data[0].meanings.forEach((posMeanings: any) => {

@@ -1,28 +1,32 @@
 <script lang="ts">
-	import { readable, writable, type Writable } from "svelte/store"
+	// import { SelectField, type MenuOption } from "svelte-ux"
+	import {
+		Autocomplete,
+		type AutocompleteOption,
+		ListBox,
+		ListBoxItem,
+	} from "@skeletonlabs/skeleton"
 	import { createTable, Subscribe, Render, createRender } from "svelte-headless-table"
-	import { WordData, loadData, saveData } from "./data"
+	import { WordData, loadData, saveData, totalWords } from "./data"
 	import Meaning from "./table-elements/Meaning.svelte"
 	import POS from "./table-elements/POS.svelte"
+	import { data } from "./store"
+	import Actions from "./table-elements/Actions.svelte"
+	import { filteredOptions, loadWordList, search20, words } from "./load_wordlist"
+	import { ThemeInit } from "svelte-ux"
+	import Word from "./table-elements/Word.svelte"
+	import Synonyms from "./table-elements/Synonyms.svelte"
 
-	let data = writable([] as WordData[])
-	loadData().then((ld) => {
-		data.set(ld)
-		console.log("Table Receieved data:")
-		console.log(ld)
-	})
-
-	// Reactive statement to save whenever data changes
-	data.subscribe((value) => {
-		saveData(value)
-	})
-
+	// $data
 	const table = createTable(data)
+	// Make it reactive so that new entries show up instantly
+	$data
 
 	const columns = table.createColumns([
 		table.column({
 			header: "Word",
 			accessor: "word",
+			cell: ({ value }) => createRender(Word, { wordString: value }),
 		}),
 		table.column({
 			header: "POS",
@@ -36,44 +40,70 @@
 		}),
 		table.column({
 			header: "Synonyms",
-			accessor: (item) => {
-				// return item.synonyms ? item.synonyms.join(", ") : "";
-				const existing = item.meanings.synonyms.get(
-					item.meanings.partOfSpeech[item.selectedDefinition]
-				)
-				return existing ? existing.slice(0, 3).join(", ") : ""
-			},
+			accessor: (item) => item,
+			cell: ({ value }) => createRender(Synonyms, { word: value }),
+		}),
+		table.column({
+			header: "Actions",
+			accessor: (item) => item,
+			cell: ({ value }) => createRender(Actions, { word: value }),
 		}),
 	])
 
 	const { headerRows, rows, tableAttrs, tableBodyAttrs } =
 		table.createViewModel(columns)
 
-	let newWord: string
-	function handleInputEnter(event: KeyboardEvent) {
-		if (event.key !== "Enter" || newWord === "") return
-		newWord = newWord.trim()
+	let newWord: string = ""
+	function handleInputEnter(event: CustomEvent<AutocompleteOption>) {
+		// if (event.key !== "Enter" || newWord === "") return
+		// newWord = newWord.trim()
+
 		console.log("Got new word")
 		console.log(newWord)
+		console.log(event)
 
 		data.update((current) => {
-			return [...current, new WordData(newWord, Date.now())]
+			return [...current, new WordData(totalWords, newWord, Date.now())]
 		})
 		newWord = ""
-		data = data
+		// $data = data
 		console.log(newWord)
 	}
+	let listedOptions: AutocompleteOption[] = []
+	$: search20(newWord).then((options) => {
+		listedOptions = options
+	})
+	// $: {
+	// 	listedOptions.push({label: "start", value: "start"})
+	// 	listedOptions = listedOptions
+	// }
+	// $: filteredOptions
+	// let options: MenuOption[] = [{label: 'axe', value: 0}]
+	// let options: MenuOption[] = words.map((word, index) => ({
+	// 	value: index,
+	// 	label: word,
+	// }))
+	// options = [{value: 0, label: ""}, ...options]
 </script>
 
-<div class="table-container">
-	<table {...$tableAttrs}>
+<ThemeInit />
+<div class="w-full py-8">
+	<table {...$tableAttrs} class="w-full">
 		<thead>
 			{#each $headerRows as headerRow (headerRow.id)}
 				<Subscribe rowAttrs={headerRow.attrs()} let:rowAttrs>
 					<tr {...rowAttrs}>
 						{#each headerRow.cells as cell (cell.id)}
 							<Subscribe attrs={cell.attrs()} let:attrs>
-								<th {...attrs}>
+								{@const synclass =
+									cell.label === "Synonyms"
+										? "hidden lg:table-cell"
+										: ""}
+								<th
+									{...attrs}
+									class={"border-y p-2 border-solid border-secondary-900 " +
+										synclass}
+								>
 									<Render of={cell.render()} />
 								</th>
 							</Subscribe>
@@ -88,7 +118,15 @@
 					<tr {...rowAttrs}>
 						{#each row.cells as cell (cell.id)}
 							<Subscribe attrs={cell.attrs()} let:attrs>
-								<td {...attrs}>
+								{@const synclass =
+									cell.column.header === "Synonyms"
+										? "hidden lg:table-cell"
+										: ""}
+								<td
+									{...attrs}
+									class={"border-b p-2 border-solid border-secondary-900 " +
+										synclass}
+								>
 									<Render of={cell.render()} />
 								</td>
 							</Subscribe>
@@ -98,51 +136,55 @@
 			{/each}
 		</tbody>
 	</table>
+	<!-- on:keyup={handleInputEnter} -->
+	<!-- <SelectField
+		options={filteredOptions}
+		bind:value={newWord}
+		class="word-input bg-primary w-full text-secondary"
+		on:change={handleInputEnter}
+		placeholder="Enter a new word"
+		search={search20}
+		/> -->
+
 	<input
 		placeholder="Enter a new word"
 		type="text"
-		class="word-input"
-		on:keyup={handleInputEnter}
+		class="word-input bg-primary-50/75 dark:bg-primary-900/75 placeholder:text-secondary"
 		bind:value={newWord}
 	/>
+	<!-- on:input={() => search20(newWord)} -->
+	<!-- <Autocomplete 
+		options={listedOptions}
+	bind:input={newWord}
+	on:selection={handleInputEnter}
+	/> -->
+	<div
+		class="p-4 card w-full overflow-y-auto text-center"
+		style:visibility={newWord === "" ? "hidden" : "visible"}
+		tabindex="-1"
+	>
+		{#await loadWordList() then}
+			<ListBox>
+				{#each listedOptions as option}
+					<ListBoxItem
+						bind:group={newWord}
+						value={option.value}
+						name="wordSelector"
+					>
+						{option.label}
+					</ListBoxItem>
+				{/each}
+			</ListBox>
+			<!-- filter={() => search20(newWord)} -->
+		{/await}
+	</div>
 </div>
 
 <style>
-	.table-container {
-		/* Table styling */
-		width: 100%;
-	}
-
-	table {
-		border-spacing: 0;
-		width: 100%;
-		/* border-collapse: collapse; */
-	}
-
-	th {
-		border-top: 1px solid var(--border-color);
-		/* border-bottom adds to td.border-top to form double border as divider between header/body */
-		border-bottom: 1px solid var(--border-color);
-		padding: 0.5rem;
-	}
-	td {
-		border-top: 1px solid var(--border-color);
-		padding: 0.5rem;
-	}
-
 	.word-input {
-		background: var(--border-color);
-		color: var(--accent-color);
-		border: 2px solid var(--accent-color);
+		border: 2px solid;
 		border-radius: 20px;
 		width: 100%;
-		padding: 1em;
-	}
-
-	.word-input::placeholder {
-		color: var(--placeholder-color);
-		text-align: center;
-		font-weight: bold;
-		font-size: medium;
+		@apply text-accent text-center rounded-xl p-4 text-base font-bold mt-4 border-secondary;
 	}
 </style>
