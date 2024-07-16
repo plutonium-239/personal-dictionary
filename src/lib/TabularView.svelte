@@ -7,18 +7,43 @@
 		ListBoxItem,
 	} from "@skeletonlabs/skeleton"
 	import { createTable, Subscribe, Render, createRender } from "svelte-headless-table"
-	import { WordData, loadData, saveData, totalWords } from "./data"
+	import { addTableFilter } from "svelte-headless-table/plugins"
+	import {
+		WordData,
+		loadData,
+		saveData,
+		searchData,
+		totalWords,
+		updateMeanings,
+	} from "./data"
 	import Meaning from "./table-elements/Meaning.svelte"
 	import POS from "./table-elements/POS.svelte"
 	import { data } from "./store"
 	import Actions from "./table-elements/Actions.svelte"
-	import { _search20, filteredOptions, loadWordList, search20, words } from "./load_wordlist"
+	import {
+		_search20,
+		filteredOptions,
+		loadWordList,
+		search20,
+		words,
+	} from "./load_wordlist"
 	import { debounceEvent, ThemeInit } from "svelte-ux"
 	import Word from "./table-elements/Word.svelte"
 	import Synonyms from "./table-elements/Synonyms.svelte"
 
+	export let searchTerm: string
 	// $data
-	const table = createTable(data)
+	let searchedData = data
+	function updateSearch() {
+		console.log($filterValue)
+
+		if ($filterValue !== "") {
+			$searchedData = searchData($data, $filterValue)
+		}
+	}
+	const table = createTable(data, {
+		tableFilter: addTableFilter(),
+	})
 	// Make it reactive so that new entries show up instantly
 	$data
 
@@ -50,26 +75,35 @@
 		}),
 	])
 
-	const { headerRows, rows, tableAttrs, tableBodyAttrs } =
+	const { headerRows, rows, tableAttrs, tableBodyAttrs, pluginStates } =
 		table.createViewModel(columns)
+	const { filterValue } = pluginStates.tableFilter
+	$: $filterValue = (searchTerm !== null) ? searchTerm : ""
 
 	let newWord: string = ""
-	function handleInputEnter(event: CustomEvent<AutocompleteOption>) {
-		// if (event.key !== "Enter" || newWord === "") return
+	function handleInputEnter(event: KeyboardEvent) {
+		if (event.key !== "Enter" || newWord === "") return
 		// newWord = newWord.trim()
 
 		console.log("Got new word")
 		console.log(newWord)
-		console.log(event)
-
+		// console.log(event)
+		let word = new WordData(totalWords, newWord, Date.now())
+		// This also increments totalWords (data.update)
 		data.update((current) => {
-			return [...current, new WordData(totalWords, newWord, Date.now())]
+			return [...current, word]
+		})
+		updateMeanings(word).then(() => {
+			data.update((current) => {
+				current[totalWords - 1] = word
+				return current
+			})
 		})
 		newWord = ""
 		// $data = data
 		console.log(newWord)
 	}
-	let listedOptions: AutocompleteOption[] = []
+	let listedOptions: AutocompleteOption<string, string>[] = []
 	// $: search20(newWord).then((options) => {
 	// 	listedOptions = options
 	// })
@@ -117,7 +151,12 @@
 				<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
 					<tr {...rowAttrs}>
 						{#each row.cells as cell (cell.id)}
-							<Subscribe attrs={cell.attrs()} let:attrs>
+							<Subscribe
+								attrs={cell.attrs()}
+								let:attrs
+								props={cell.props()}
+								let:props
+							>
 								{@const synclass =
 									cell.column.header === "Synonyms"
 										? "hidden lg:table-cell"
@@ -126,6 +165,7 @@
 									{...attrs}
 									class={"border-b p-2 border-solid border-secondary-900 " +
 										synclass}
+									class:matches={props.tableFilter.matches}
 								>
 									<Render of={cell.render()} />
 								</td>
@@ -149,7 +189,7 @@
 	<input
 		placeholder="Enter a new word"
 		type="text"
-		class="word-input bg-primary-50/75 dark:bg-primary-900/75 placeholder:text-secondary"
+		class="word-input bg-primary-50/75 dark:bg-primary-900/75 placeholder:text-secondary-700 dark:placeholder:text-secondary"
 		bind:value={newWord}
 		use:debounceEvent={{
 			type: "input",
@@ -158,6 +198,7 @@
 			},
 			timeout: 200,
 		}}
+		on:keypress={handleInputEnter}
 	/>
 	<!-- on:input={() => search20(newWord)} -->
 	<!-- <Autocomplete 
@@ -166,8 +207,7 @@
 	on:selection={handleInputEnter}
 	/> -->
 	<div
-		class="p-4 card w-full overflow-y-auto text-center"
-		style:visibility={newWord === "" ? "hidden" : "visible"}
+		class="p-4 card w-full overflow-y-auto text-center {newWord===""?"hidden":""}"
 		tabindex="-1"
 	>
 		{#await loadWordList() then}
@@ -177,6 +217,10 @@
 						bind:group={newWord}
 						value={option.value}
 						name="wordSelector"
+						on:click={() => {
+							newWord = option.value
+							// handleInputEnter()
+						}}
 					>
 						{option.label}
 					</ListBoxItem>

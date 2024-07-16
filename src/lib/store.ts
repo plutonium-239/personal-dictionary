@@ -16,3 +16,7 @@ loadData().then((ld) => {
 data.subscribe((value) => {
 	saveData(value)
 })
+
+export let editMode = writable(false)
+
+export let isDark = writable(true)

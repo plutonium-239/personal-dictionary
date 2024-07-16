@@ -25,6 +25,7 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "@egjs/svelte-grid": "^1.16.0",
     "@floating-ui/dom": "^1.6.6",
     "fast-fuzzy": "^1.12.0",
     "svelte-persisted-store": "^0.11.0",

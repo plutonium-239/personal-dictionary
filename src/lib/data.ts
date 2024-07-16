@@ -1,6 +1,8 @@
-export let totalWords: number
+import { search } from "fast-fuzzy"
 
-class SingleDefinition {
+export let totalWords: number = 0
+
+export class SingleDefinition {
 	constructor(public definition: string, public example: string = "") {}
 	static makefrom(obj: any): SingleDefinition {
 		return new SingleDefinition(obj.definition, obj.example)
@@ -36,7 +38,7 @@ class Meanings {
 
 export class WordData {
 	constructor(
-		public index: number,
+		public id: number,
 		public word: string,
 		public dateAdded: number,
 		public fetched: boolean = false,
@@ -47,7 +49,7 @@ export class WordData {
 	) {}
 	static makefrom(obj: any): WordData {
 		return new WordData(
-			obj.index,
+			obj.id,
 			obj.word,
 			obj.dateAdded,
 			obj.fetched,
@@ -141,4 +143,12 @@ export function updateMeanings(word: WordData) {
 			console.error(`${word}: ${err}`)
 			return word
 		})
+}
+
+
+export function searchData(data: WordData[], searchTerm: string) {
+	let matchingWords = search(searchTerm, data, {keySelector: (w: WordData) => w.word})
+	return data.filter((word) => {
+		return matchingWords.includes(word)
+	})
 }

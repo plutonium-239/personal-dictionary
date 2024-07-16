@@ -1,19 +1,51 @@
 import { Searcher } from "fast-fuzzy"
 import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 import { debounce } from "ts-debounce";
+import wordLoader from "./wordlistWorker?worker";
+import wordListUrl from "../assets/words_alpha.txt";
 
 export let words: string[] = []
 export let filteredOptions: AutocompleteOption<string, string>[]
 let searcher: Searcher<string, {}>
 
 export async function loadWordList() {
-	const filecontent = (await import("../assets/words_alpha.txt?raw")).default
-	words = filecontent.split("\r\n")
-	console.log(`Loaded words, length = ${words.length}`)
-	// console.log(words.slice(0, 10))
-	searcher = new Searcher(words)
-	filteredOptions = makeItems(words.slice(0, 20))
+    return new Promise<void>((resolve, reject) => {
+        const worker = new wordLoader(); // Path to your worker file
+        
+        worker.onmessage = (event) => {
+            words = event.data;
+            console.log(`Loaded words, length = ${words.length}`);
+            searcher = new Searcher(words);
+            filteredOptions = makeItems(words.slice(0, 20));
+            resolve(); // Resolve the promise when done
+            worker.terminate(); // Terminate the worker
+        };
+
+        worker.onerror = (error) => {
+            console.error("Worker error:", error);
+            reject(error); // Reject the promise on error
+            worker.terminate();
+        };
+
+        // Fetch the file content and send it to the worker
+        fetch(wordListUrl)
+            .then(response => response.text())
+            .then(text => worker.postMessage(text))
+            .catch(error => {
+                console.error("Error fetching file:", error);
+                reject(error);
+            });
+    });
 }
+
+// export async function loadWordList() {
+// 	const filecontent = (await import("../assets/words_alpha.txt?raw")).default
+// 	words = filecontent.split("\r\n")
+// 	console.log(`Loaded words, length = ${words.length}`)
+// 	// console.log(words.slice(0, 10))
+// 	searcher = new Searcher(words)
+// 	filteredOptions = makeItems(words.slice(0, 20))
+// }
 
 export function makeItems(strings: string[]): AutocompleteOption<string, string>[] {
 	return strings.map((word) => ({
