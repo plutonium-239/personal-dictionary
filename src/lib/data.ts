@@ -23,16 +23,25 @@ class Meanings {
 		return new Meanings(
 			obj.partOfSpeech,
 			obj.definitions.map((def: any) => SingleDefinition.makefrom(def)),
-			(obj.synonyms = new Map<string, string[]>(Object.entries(obj.synonyms))),
-			(obj.antonyms = new Map<string, string[]>(Object.entries(obj.antonyms)))
+			new Map<string, string[]>(obj.synonyms),
+			new Map<string, string[]>(obj.antonyms)
 		)
 	}
-
+	
 	appendOne(pos: string, def: SingleDefinition, syn: string[], ant: string[]) {
 		this.partOfSpeech.push(pos)
 		this.definitions.push(def)
 		this.synonyms.set(pos, syn)
 		this.antonyms.set(pos, ant)
+	}
+
+	toJSON() {
+		return {
+			partOfSpeech: this.partOfSpeech,
+			definitions: this.definitions,
+			synonyms: [...this.synonyms],
+			antonyms: [...this.antonyms],
+		}
 	}
 }
 

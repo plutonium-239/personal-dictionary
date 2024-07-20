@@ -4,6 +4,7 @@
 	import { PackingGrid } from "@egjs/svelte-grid"
 	export let word: WordData
 	import { data } from "../store"
+	import Synonyms from "./Synonyms.svelte"
 
 	// let items = getItems(0, 10);
 
@@ -68,11 +69,27 @@ percentage=true
 	{pos} -->
 <!-- </span> -->
 {@const selectedPOS = pos == word.meanings.partOfSpeech[word.selectedDefinition]}
+{@const syns = word.meanings.synonyms.get(pos)}
+{@const ants = word.meanings.antonyms.get(pos)}
 
 <div class="m-4 p-4 flex flex-col gap-4 outline outline-1 rounded-xl {selectedPOS?"outline-primary":"outline-secondary"}">
-<span class="pos px-2 w-fit rounded font-bold italic text-primary-content bg-primary">
-	{pos}
-</span>
+<div class="px-2 flex flex-col gap-2 rounded">
+	<span class="px-2 w-fit font-bold italic text-primary-content bg-primary">
+		{pos}
+	</span>
+	{#if syns && syns.length > 0 }
+	<div class="p-2 outline outline-1 outline-secondary bg-secondary/30 rounded">
+		<span class="font-bold text-primary">Synonyms:</span> 
+		{syns.join(", ")}
+	</div>
+	{/if}
+	{#if ants && ants.length > 0 }
+	<div class="p-2 outline outline-1 outline-secondary bg-secondary/30 rounded">
+		<span class="font-bold text-primary">Antonyms:</span> 
+		{ants.join(", ")}
+	</div>
+	{/if}
+</div>
 
 <div class="flex flex-wrap gap-4">
 	{#each definitions as def, index (index)}
