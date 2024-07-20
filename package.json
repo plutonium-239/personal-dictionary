@@ -28,7 +28,7 @@
     "@egjs/svelte-grid": "^1.16.0",
     "@floating-ui/dom": "^1.6.6",
     "fast-fuzzy": "^1.12.0",
-    "svelte-persisted-store": "^0.11.0",
+    "p-throttle": "^6.1.0",
     "svelte-ux": "^0.71.2",
     "ts-debounce": "^4.0.0"
   }
