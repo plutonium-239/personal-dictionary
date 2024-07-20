@@ -9,7 +9,7 @@
 	const { currentTheme, themes, showDrawer } = getSettings()
 
 	import TabularView from "./lib/TabularView.svelte"
-	import { editMode, globalTheme, isDark } from "./lib/store"
+	import { editMode, isDark } from "./lib/store"
 	import { ThemeSelect, AppLayout, ThemeInit } from "svelte-ux"
 	import DeleteIcon from "./lib/icons/delete-2.svg?raw"
 	import SearchIcon from "./lib/icons/search.svg?raw"
@@ -28,17 +28,9 @@
 		{ label: "Crimson", value: "crimson" },
 	]
 
-	$: console.log(`Changing globalTheme to ${$globalTheme.name}`)
 	$: console.log($currentTheme.theme)
 	$: $isDark = $currentTheme.dark
 
-	function setTheme() {
-		console.log(`Setting body to ${$globalTheme.name}`)
-		// document.body.setAttribute("data-theme", $globalTheme.name)
-	}
-	if ($globalTheme.name !== undefined) {
-		setTheme()
-	}
 	$showDrawer = false
 	console.log(`editMode is ${$editMode}`)
 	let searchTerm: string

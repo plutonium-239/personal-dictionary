@@ -10,8 +10,9 @@
 		ListItem,
 	} from "svelte-ux"
 	import listAddIcon from "./icons/list-add.svg?raw"
-	import { data, isDark } from "./store"
+	import { data, isDark, separator } from "./store"
 	import { totalWords, updateMeanings, WordData } from "./data"
+	import pThrottle from "p-throttle";
 	let cls: string = ""
 	export { cls as class }
 	let open: boolean = false
@@ -19,35 +20,63 @@
 	let titleNode: HTMLDivElement, actionsNode: HTMLDivElement
 	let innerHeight: number
 	let textareaHeight = 100
-	let separator: string = " "
+	// let separator: string = " "
 	let parsedData: WordData[] = []
 	let loadingDone: boolean[] = []
 
-	function addMultiple(wordlist: string[]) {
-		wordlist.forEach((w, i) => {
+	// const maxAllowed = 5 // per minute
+	// let currentConn = 0
+	// let timeSinceLast = 0
+	// async function limiter() {
+		
+	// }
+	const throttle = pThrottle({
+		limit: 5,
+		interval: 2000,
+		onDelay: () => {
+			console.log('Reached interval limit, call is delayed');
+		},
+	});
+
+	function parseMultiple(wordlist: string[]) {
+		parsedData = []
+		loadingDone = []
+		
+		wordlist.forEach(async (w, i) => {
 			let word = new WordData(i, w.trim(), Date.now())
 			parsedData.push(word)
 			loadingDone.push(false)
-			updateMeanings(word).then(() => {
+			console.log("Made new word");
+			await throttle(async () => {
+				await updateMeanings(word)
 				parsedData[i] = word
 				loadingDone[i] = true
-			})
+			})();
+		});
+		// (async () => {await Promise.all(promises)})();
+	}
+	function addParsed() {
+		data.update((current) => {
+			return current.concat(parsedData)
 		})
-		// data.update((current) => {
-		// 	return current.concat(parsedData)
-		// })
+		open = false
 	}
 
 	function formatList(text: string): string[] {
-		let list = text.split(separator)
+		if (!text) return []
+		let list = text.split($separator)
+		console.log({sep: $separator, t: text});
+		console.log(list);
+		
+		
 		if (list.length == 1)
-			alert(`Separating with ${separator} only gave 1 length array`)
+			alert(`Separating with ${$separator} only gave 1 length array`)
 		return list
 	}
 	$: console.log(titleNode?.parentElement!.clientHeight);
 	
 	function calcH(innerHeight: number, titleHeight: number, actionsHeight: number) {
-		return 0.8 * innerHeight - 20 - 32 - (titleHeight + actionsHeight)
+		return 0.8 * innerHeight - 64 - 36 - (titleHeight + actionsHeight)
 	}
 	$: textareaHeight = calcH(innerHeight, titleNode?.parentElement!.clientHeight, actionsNode?.parentElement!.clientHeight, )
 </script>
@@ -78,12 +107,14 @@
 				<ToggleGroup
 					id="separator_choice"
 					variant="fill"
-					bind:value={separator}
+					bind:value={$separator}
 					rounded
 					class="font-mono"
+					on:change={() => parseMultiple(formatList(inputText))}
 				>
 					<ToggleOption value=",">,</ToggleOption>
-					<ToggleOption value="\n">\n</ToggleOption>
+					<ToggleOption value={`\n`}>\n</ToggleOption>
+					<ToggleOption value={`\r\n`}>\r\n</ToggleOption>
 					<ToggleOption value=" ">(space)</ToggleOption>
 				</ToggleGroup>
 			</div>
@@ -92,9 +123,9 @@
 			<Button
 				variant="fill"
 				color="success"
-				disabled={inputText !== ""}
+				disabled={parsedData.length === 0}
 				on:click={() => {
-					addMultiple(formatList(inputText))
+					addParsed()
 					inputText = ""
 				}}>Confirm</Button
 			>
@@ -114,14 +145,15 @@
 						classes={{ input: `h-[var(--textareaHeight)] box-border` }}
 						autofocus
 						bind:value={inputText}
+						on:change={() => parseMultiple(formatList(inputText))}
 					/>
 				</TogglePanel>
 				<TogglePanel>
 					{#each parsedData as w, i (w.id)}
 						<ListItem
 							title={w.word}
-							loading={loadingDone[i]}
-							class="text-{w.fetched ? "success": "danger"}"
+							loading={!loadingDone[i]}
+							class="{w.fetched ? "text-success": "text-danger"}"
 						/>
 					{/each}
 				</TogglePanel>

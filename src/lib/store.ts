@@ -1,8 +1,6 @@
 import { writable } from "svelte/store"
 import { loadData, saveData, type WordData } from "./data"
-import { persisted } from "svelte-persisted-store"
-
-export let globalTheme = persisted("skeletontheme", {name: "skeleton"})
+import { localStore } from "svelte-ux"
 
 export let data = writable([] as WordData[])
 
@@ -17,6 +15,9 @@ data.subscribe((value) => {
 	saveData(value)
 })
 
+// Not persisted:
 export let editMode = writable(false)
-
 export let isDark = writable(true)
+
+// Persisted:
+export let separator = localStore("separator", " ")
