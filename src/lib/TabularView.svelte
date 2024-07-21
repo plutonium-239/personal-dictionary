@@ -1,46 +1,18 @@
 <script lang="ts">
-	// import { SelectField, type MenuOption } from "svelte-ux"
-	import {
-		Autocomplete,
-		type AutocompleteOption,
-		ListBox,
-		ListBoxItem,
-	} from "@skeletonlabs/skeleton"
 	import { createTable, Subscribe, Render, createRender } from "svelte-headless-table"
 	import { addTableFilter } from "svelte-headless-table/plugins"
-	import {
-		WordData,
-		loadData,
-		saveData,
-		searchData,
-		totalWords,
-		updateMeanings,
-	} from "./data"
+	import { WordData, totalWords, updateMeanings } from "./data"
 	import Meaning from "./table-elements/Meaning.svelte"
 	import POS from "./table-elements/POS.svelte"
 	import { data } from "./store"
 	import Actions from "./table-elements/Actions.svelte"
-	import {
-		_search20,
-		filteredOptions,
-		loadWordList,
-		search20,
-		words,
-	} from "./load_wordlist"
-	import { debounceEvent, ThemeInit } from "svelte-ux"
+	import { search20, loadWordList } from "./load_wordlist"
+	import { debounceEvent, ListItem, ThemeInit } from "svelte-ux"
 	import Word from "./table-elements/Word.svelte"
 	import Synonyms from "./table-elements/Synonyms.svelte"
 
 	export let searchTerm: string
-	// $data
-	let searchedData = data
-	function updateSearch() {
-		console.log($filterValue)
 
-		if ($filterValue !== "") {
-			$searchedData = searchData($data, $filterValue)
-		}
-	}
 	const table = createTable(data, {
 		tableFilter: addTableFilter(),
 	})
@@ -78,11 +50,16 @@
 	const { headerRows, rows, tableAttrs, tableBodyAttrs, pluginStates } =
 		table.createViewModel(columns)
 	const { filterValue } = pluginStates.tableFilter
-	$: $filterValue = (searchTerm !== null) ? searchTerm : ""
+	$: $filterValue = searchTerm !== null ? searchTerm : ""
 
 	let newWord: string = ""
+	let completionSelected: boolean = false
 	function handleInputEnter(event: KeyboardEvent) {
-		if (event.key !== "Enter" || newWord === "") return
+		if (newWord === "") {
+			completionSelected = false
+			return
+		}
+		if (event.key !== "Enter") return
 		// newWord = newWord.trim()
 
 		console.log("Got new word")
@@ -100,10 +77,11 @@
 			})
 		})
 		newWord = ""
+		completionSelected = false
 		// $data = data
 		console.log(newWord)
 	}
-	let listedOptions: AutocompleteOption<string, string>[] = []
+	let listedOptions: string[] = []
 	// $: search20(newWord).then((options) => {
 	// 	listedOptions = options
 	// })
@@ -194,7 +172,9 @@
 		use:debounceEvent={{
 			type: "input",
 			listener: () => {
-				listedOptions = _search20(newWord)
+				search20(newWord).then(res => {
+					listedOptions = res
+				})
 			},
 			timeout: 200,
 		}}
@@ -206,26 +186,32 @@
 	bind:input={newWord}
 	on:selection={handleInputEnter}
 	/> -->
-	<div
-		class="p-4 card w-full overflow-y-auto text-center {newWord===""?"hidden":""}"
-		tabindex="-1"
-	>
+	<div class="overflow-y-hidden">
+		<div
+			class="transition-transform duration-200 bg-success mx-2 p-2 text-center rounded-b-xl 
+			border border-t-0 text-sm font-bold text-neutral-content dark:text-neutral
+			{completionSelected ? 'translate-y-0':'-translate-y-full'}"
+		>
+			Completion
+			<span>{newWord}</span>
+			has been selected! Press <kbd>Enter</kbd> to add to your list.
+		</div>
+	</div>
+	<div class="m-2 overflow-y-auto text-center {newWord === '' ? 'hidden' : ''}">
 		{#await loadWordList() then}
-			<ListBox>
-				{#each listedOptions as option}
-					<ListBoxItem
-						bind:group={newWord}
-						value={option.value}
-						name="wordSelector"
-						on:click={() => {
-							newWord = option.value
-							// handleInputEnter()
-						}}
-					>
-						{option.label}
-					</ListBoxItem>
-				{/each}
-			</ListBox>
+			<!-- <ListBox> -->
+			{#each listedOptions as option}
+				<ListItem
+					class="hover:bg-secondary hover:text-secondary-content cursor-pointer"
+					on:click={() => {
+						completionSelected = true
+						newWord = option
+						// handleInputEnter()
+					}}
+					title={option}
+				/>
+			{/each}
+			<!-- </ListBox> -->
 			<!-- filter={() => search20(newWord)} -->
 		{/await}
 	</div>
@@ -236,6 +222,6 @@
 		border: 2px solid;
 		border-radius: 20px;
 		width: 100%;
-		@apply text-accent text-center rounded-xl p-4 text-base font-bold mt-4 border-secondary;
+		@apply text-accent-900 dark:text-accent text-center rounded-xl p-4 text-base font-bold mt-4 border-secondary;
 	}
 </style>
