@@ -3,7 +3,6 @@
 		Button,
 		Dialog,
 		TextField,
-		Field,
 		ToggleGroup,
 		ToggleOption,
 		TogglePanel,
@@ -11,7 +10,7 @@
 	} from "svelte-ux"
 	import listAddIcon from "./icons/list-add.svg?raw"
 	import { data, isDark, separator } from "./store"
-	import { totalWords, updateMeanings, WordData } from "./data"
+	import { updateMeanings, WordData } from "./data"
 	import pThrottle from "p-throttle";
 	let cls: string = ""
 	export { cls as class }

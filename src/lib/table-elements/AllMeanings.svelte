@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { ExpansionPanel } from "svelte-ux"
 	import type { WordData, SingleDefinition } from "../data"
-	import { PackingGrid } from "@egjs/svelte-grid"
 	export let word: WordData
 	import { data } from "../store"
-	import Synonyms from "./Synonyms.svelte"
 
 	// let items = getItems(0, 10);
 
