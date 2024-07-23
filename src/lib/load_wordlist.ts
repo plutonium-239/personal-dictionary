@@ -27,7 +27,6 @@ export async function loadWordList() {
 // }
 
 worker.onmessage = (e) => {
-    // console.log(e.data);
     if (e.data === "Built WordList") {
         workerReady = true;
         wordlistBuiltResolver(true);
@@ -41,6 +40,7 @@ worker.onmessage = (e) => {
 
 export async function search20(text: string) {
     if (!workerReady) await loadWordList()
+    if (!text) return []
     return new Promise<string[]>((resolve) => {
         searchResolver = resolve
         worker.postMessage({command: "search", text: text})

@@ -7,9 +7,11 @@
 	import { data } from "./store"
 	import Actions from "./table-elements/Actions.svelte"
 	import { search20, loadWordList } from "./load_wordlist"
-	import { debounceEvent, ListItem, ThemeInit } from "svelte-ux"
+	import { Button, debounceEvent, ListItem, sticky, TextField, ThemeInit } from "svelte-ux"
 	import Word from "./table-elements/Word.svelte"
 	import Synonyms from "./table-elements/Synonyms.svelte"
+	import BulkImport from "./BulkImport.svelte"
+	import AddIcon from "./icons/add-circle.svg?raw"
 
 	export let searchTerm: string
 
@@ -54,12 +56,9 @@
 
 	let newWord: string = ""
 	let completionSelected: boolean = false
-	function handleInputEnter(event: KeyboardEvent) {
-		if (newWord === "") {
-			completionSelected = false
+	function handleInputEnter(event: KeyboardEvent | MouseEvent) {
+		if (newWord === "" || (event instanceof KeyboardEvent && event.key !== "Enter")) 
 			return
-		}
-		if (event.key !== "Enter") return
 		// newWord = newWord.trim()
 
 		console.log("Got new word")
@@ -77,29 +76,90 @@
 			})
 		})
 		newWord = ""
-		completionSelected = false
 		// $data = data
 		console.log(newWord)
 	}
 	let listedOptions: string[] = []
-	// $: search20(newWord).then((options) => {
-	// 	listedOptions = options
-	// })
-	// $: {
-	// 	listedOptions.push({label: "start", value: "start"})
-	// 	listedOptions = listedOptions
-	// }
-	// $: filteredOptions
-	// let options: MenuOption[] = [{label: 'axe', value: 0}]
-	// let options: MenuOption[] = words.map((word, index) => ({
-	// 	value: index,
-	// 	label: word,
-	// }))
-	// options = [{value: 0, label: ""}, ...options]
+	let hintNode: HTMLDivElement
+	let hintHeight: number = 38
+	let textField: TextField
+	$: hintHeight = hintNode?.clientHeight
+
+	$: if (!newWord) completionSelected = false
+	
 </script>
 
 <ThemeInit />
-<div class="w-full py-8">
+
+<div class="pt-8 flex justify-center items-stretch gap-2 bg-surface-200">
+	<TextField
+		bind:this={textField}
+		placeholder="Enter a new word"
+		classes={{
+			root: "w-full",
+			container: "bg-primary-50/75 dark:bg-primary-900/75 rounded-xl px-4 py-2 border-2 border-secondary",
+			input: "text-base font-bold text-accent-900 dark:text-accent text-center placeholder:text-secondary-700 dark:placeholder:text-secondary"
+		}}
+		on:change={() => {
+			search20(newWord).then(res => {
+				listedOptions = res
+			})
+		}}
+		debounceChange={200}
+		bind:value={newWord}
+		on:keypress={handleInputEnter}
+	>
+		<svelte:fragment slot="append">
+			<Button 
+				variant="fill-light"
+				color="primary"
+				icon={AddIcon}
+				on:click={handleInputEnter}
+				disabled={!newWord}
+				class="max-md:px-2"
+			>
+				<span class="max-md:hidden">Add</span>
+			</Button>
+		</svelte:fragment>
+	</TextField>
+	<BulkImport class="w-auto h-auto content-center"/>
+</div>
+<div class="overflow-y-hidden" bind:this={hintNode}>
+	<div
+		class="transition-transform duration-200 bg-success mx-2 p-2 text-center rounded-b-xl 
+		border border-t-0 text-sm font-bold text-neutral-content dark:text-neutral
+		{completionSelected ? 'translate-y-0':'-translate-y-full'}"
+	>
+		Completion
+		<span>{newWord}</span>
+		has been selected! Press <kbd>Enter</kbd> to add to your list.
+	</div>
+</div>
+<div style:--hintHeight="{hintHeight}px"
+class="m-2 mb-6 overflow-y-auto text-center 
+{!newWord ? 'hidden' : ''} 
+{completionSelected ? "":"-mt-[--hintHeight]"}"
+>
+	{#await loadWordList() then}
+		<!-- <ListBox> -->
+		{#each listedOptions as option}
+			<ListItem
+				class="hover:bg-secondary hover:text-secondary-content cursor-pointer"
+				on:click={() => {
+					completionSelected = true
+					newWord = option
+					// handleInputEnter()
+				}}
+				title={option}
+			/>
+		{/each}
+		<!-- </ListBox> -->
+		<!-- filter={() => search20(newWord)} -->
+	{/await}
+</div>
+
+<!-- TODO: Combine Word,POS columns when small (maybe using grid layout option?) -->
+<div class="pb-6 w-full">
 	<table {...$tableAttrs} class="w-full">
 		<thead>
 			{#each $headerRows as headerRow (headerRow.id)}
@@ -164,64 +224,17 @@
 		search={search20}
 		/> -->
 
-	<input
-		placeholder="Enter a new word"
-		type="text"
-		class="word-input bg-primary-50/75 dark:bg-primary-900/75 placeholder:text-secondary-700 dark:placeholder:text-secondary"
-		bind:value={newWord}
-		use:debounceEvent={{
-			type: "input",
-			listener: () => {
-				search20(newWord).then(res => {
-					listedOptions = res
-				})
-			},
-			timeout: 200,
-		}}
-		on:keypress={handleInputEnter}
-	/>
 	<!-- on:input={() => search20(newWord)} -->
 	<!-- <Autocomplete 
 		options={listedOptions}
 	bind:input={newWord}
 	on:selection={handleInputEnter}
 	/> -->
-	<div class="overflow-y-hidden">
-		<div
-			class="transition-transform duration-200 bg-success mx-2 p-2 text-center rounded-b-xl 
-			border border-t-0 text-sm font-bold text-neutral-content dark:text-neutral
-			{completionSelected ? 'translate-y-0':'-translate-y-full'}"
-		>
-			Completion
-			<span>{newWord}</span>
-			has been selected! Press <kbd>Enter</kbd> to add to your list.
-		</div>
-	</div>
-	<div class="m-2 overflow-y-auto text-center {newWord === '' ? 'hidden' : ''}">
-		{#await loadWordList() then}
-			<!-- <ListBox> -->
-			{#each listedOptions as option}
-				<ListItem
-					class="hover:bg-secondary hover:text-secondary-content cursor-pointer"
-					on:click={() => {
-						completionSelected = true
-						newWord = option
-						// handleInputEnter()
-					}}
-					title={option}
-				/>
-			{/each}
-			<!-- </ListBox> -->
-			<!-- filter={() => search20(newWord)} -->
-		{/await}
-	</div>
+	
 </div>
 
 <style>
 	.word-input {
-		border: 2px solid;
-		border-radius: 20px;
-		width: 100%;
-		@apply text-accent-900 dark:text-accent text-center rounded-xl p-4 text-base font-bold mt-4 border-secondary;
+		@apply w-full border-2 border-secondary text-accent-900 dark:text-accent text-center rounded-xl p-4 text-base font-bold;
 	}
 </style>

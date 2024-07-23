@@ -6,17 +6,42 @@ html {
   @apply bg-surface-200 accent-primary;
 }
 
+.bg_enabled {
+  background-image: url("/cuteicon_fullbg.svg");
+  min-height: 100vh;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 header.AppBar > .grid {
   justify-content: unset;
 }
 
-.label + .input {
+.TextField .input {
   @apply border-none my-0 bg-transparent;
 }
 
 .prepend > span {
   margin-right: unset;
 }
+
+.theme-selector-parent > .Button {
+  @apply min-w-max;
+}
+
+.theme-selector-parent > .Button:hover, .theme-selector-parent > .Button:focus {
+  @apply animate-[animateBg_1s_linear_infinite];
+  background-size: 300% 100%;
+  background-image: linear-gradient(to right,
+    theme("colors.accent"),
+    theme("colors.secondary"),
+    theme("colors.accent"),
+    theme("colors.secondary")
+  );
+}
+
 
 @keyframes animateBg {
   0% {
@@ -26,6 +51,26 @@ header.AppBar > .grid {
     background-position: 100% 0;
   }
 }
+
+@font-face {
+  font-family: "MTF Be Mine";
+  src: url("/font_mtf-be-mine/mtf-be-mine.eot");
+  src: url("/font_mtf-be-mine/mtf-be-mine.eot?#iefix")format("embedded-opentype"),
+  url("/font_mtf-be-mine/mtf-be-mine.woff2")format("woff2"),
+  url("/font_mtf-be-mine/mtf-be-mine.woff")format("woff"),
+  url("/font_mtf-be-mine/mtf-be-mine.ttf")format("truetype"),
+  url("/font_mtf-be-mine/mtf-be-mine.svg#MTF Be Mine")format("svg");
+}
+
+header.AppBar > .Icon + div {
+  font-family: "MTF Be Mine";
+  @apply text-3xl md:text-5xl small-header ;
+  /* font-size: xxx-large; */
+}
+.small-header {
+  @apply max-md:flex max-md:flex-wrap max-md:h-full max-md:content-end max-md:w-min;
+}
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

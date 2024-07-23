@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AppBar, Button, getSettings, Icon, TextField } from "svelte-ux"
+	import { AppBar, Button, ButtonGroup, getSettings, Icon, TextField } from "svelte-ux"
 	import svelteUXthemes from "../themes.json"
 	import { getThemeNames } from "./main"
 	import { settings } from "svelte-ux"
@@ -9,11 +9,13 @@
 	const { currentTheme, themes, showDrawer } = getSettings()
 
 	import TabularView from "./lib/TabularView.svelte"
-	import { editMode, isDark } from "./lib/store"
+	import { editMode, isDark, useBg } from "./lib/store"
 	import { ThemeSelect, AppLayout, ThemeInit } from "svelte-ux"
 	import DeleteIcon from "./lib/icons/delete-2.svg?raw"
 	import SearchIcon from "./lib/icons/search.svg?raw"
+	import AppIcon from "./assets/cuteicon_full.svg?raw"
 	import BulkImport from "./lib/BulkImport.svelte"
+	import Settings from "./lib/Settings.svelte"
 
 	const skeletonthemes = [
 		{ label: "Skeleton", value: "skeleton" },
@@ -37,15 +39,18 @@
 </script>
 
 <ThemeInit />
-<AppLayout areas="'header header' 'aside main'">
+<AppLayout 
+	areas="'header header' 'aside main'" 
+	classes={{root: $useBg?"bg_enabled":"" }}
+>
 	<svelte:fragment slot="nav">
 		<!-- Nav menu -->
 	</svelte:fragment>
 	<AppBar
-		title="personal dictionary"
+		title="Personal Dictionary"
 		class="bg-primary text-primary-content"
-		menuIcon={null}
 	>
+		<Icon slot="menuIcon" data={AppIcon} width="auto" height="4em"/>
 		<div slot="actions" class="flex items-center">
 			<div class="mr-auto"></div>
 			<TextField
@@ -67,14 +72,15 @@
 			<Button
 				variant="fill"
 				color={$editMode ? "danger" : "secondary"}
-				class="rounded-xl mx-4 ml-auto"
+				class="rounded-xl max-md:px-2 mx-4 ml-auto"
 				icon={DeleteIcon}
 				on:click={() => {
 					$editMode = !$editMode
 				}}
 			>
-				Edit Mode
+				<span class="max-md:hidden">Edit Mode</span>
 			</Button>
+			<Settings />
 			<div class="mx-4 bg-info/50 rounded-full self-center theme-selector-parent">
 				<ThemeSelect />
 			</div>
@@ -93,7 +99,6 @@
 				</ListBoxItem>
 			{/each}
 		</ListBox> -->
-		<BulkImport class="mt-8 mx-8 lg:mx-24 self-end w-auto"/>
 		<div class="max-w-[100vw] px-8 lg:px-24 pt-0">
 			<TabularView searchTerm={searchTerm} />
 		</div>
@@ -113,17 +118,5 @@
 
 	.root-app-layout {
 		--drawerWidth: 0px;
-	}
-
-	:global(.theme-selector-parent > .Button:hover, .theme-selector-parent > .Button:focus) {
-		@apply animate-[animateBg_1s_linear_infinite];
-		background-size: 300% 100%;
-		background-image: linear-gradient(to right,
-			theme("colors.accent"),
-			theme("colors.secondary"),
-			theme("colors.accent"),
-			theme("colors.secondary")
-		);
-	}
-	
+	}	
 </style>

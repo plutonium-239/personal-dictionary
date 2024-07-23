@@ -21,3 +21,5 @@ export let isDark = writable(true)
 
 // Persisted:
 export let separator = localStore("separator", " ")
+
+export let useBg = localStore("useBg", false)

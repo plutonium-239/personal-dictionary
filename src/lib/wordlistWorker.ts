@@ -20,7 +20,7 @@ onmessage = async (e) => {
             // postMessage(words)
             postMessage("Built WordList")
         case "search":
-            search(e.data.text, 20)        
+            search(e.data.text, 10)
             postMessage(filteredOptions)
     }
 };
@@ -72,7 +72,7 @@ function search(text: string, size: number) {
 		filteredwords = searcher.search(text)
 		filteredwords = filteredwords.slice(0, Math.min(size, filteredwords.length))
 	}
-	console.log("search returning")
+	// console.log("search returning")
 	filteredOptions = filteredwords
 	// return filteredOptions
 }
