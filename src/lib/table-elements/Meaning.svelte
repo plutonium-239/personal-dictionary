@@ -19,7 +19,13 @@
 >
 	<span>{definition}</span>
 </button>
-<Dialog bind:open={expanded} classes={{title: "bg-gradient-to-b from-primary/25 to-transparent",  dialog: "w-[85%] max-h-[85%]" }}>
+<Dialog
+	bind:open={expanded}
+	classes={{
+		title: "bg-gradient-to-b from-primary/25 to-transparent",
+		dialog: "w-[85%] max-h-[85%] border-2 border-primary",
+	}}
+>
 	<div slot="title" class="text-secondary flex w-100 justify-between">
 		All definitions for {word.word}
 		<Button
