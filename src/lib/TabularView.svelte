@@ -237,7 +237,7 @@ class="m-2 mb-6 overflow-y-auto text-center
 	
 </div>
 
-<style>
+<style type="text/postcss">
 	.word-input {
 		@apply w-full border-2 border-secondary text-accent-900 dark:text-accent text-center rounded-xl p-4 text-base font-bold;
 	}

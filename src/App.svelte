@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AppBar, Button, ButtonGroup, getSettings, Icon, TextField } from "svelte-ux"
+	import { AppBar, Button, getSettings, Icon, TextField } from "svelte-ux"
 	import svelteUXthemes from "../themes.json"
 	import { getThemeNames } from "./main"
 	import { settings } from "svelte-ux"
@@ -14,7 +14,6 @@
 	import DeleteIcon from "./lib/icons/delete-2.svg?raw"
 	import SearchIcon from "./lib/icons/search.svg?raw"
 	import AppIcon from "./assets/cuteicon_full.svg?raw"
-	import BulkImport from "./lib/BulkImport.svelte"
 	import Settings from "./lib/Settings.svelte"
 
 	const skeletonthemes = [
@@ -107,18 +106,6 @@
 	</main>
 </AppLayout>
 
-<style>
-	.logo {
-		height: 6em;
-		padding: 1.5em;
-		will-change: filter;
-		transition: filter 300ms;
-	}
-	.logo:hover {
-		filter: drop-shadow(0 0 2em #646cffaa);
-	}
+<style type="text/postcss">
 
-	.root-app-layout {
-		--drawerWidth: 0px;
-	}
 </style>
