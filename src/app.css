@@ -7,8 +7,8 @@ html {
 }
 
 .bg_enabled {
-  background-image: url("/cuteicon_fullbg.svg");
-  min-height: 100vh;
+  background-image: var(--bgUrl);
+  min-height: calc(100vh - var(--headerHeight));
   background-attachment: fixed;
   background-repeat: no-repeat;
   background-size: contain;

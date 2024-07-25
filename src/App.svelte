@@ -38,19 +38,21 @@
 	let searchTerm: string
 </script>
 
+<!-- For some reason, setting the same in index.html causes it to get auto-capitalized -->
+<svelte:head>
+	<title>personal dictionary</title>
+</svelte:head>
 <ThemeInit />
-<AppLayout 
-	areas="'header header' 'aside main'" 
-	classes={{root: $useBg?"bg_enabled":"" }}
+<AppLayout
+	areas="'header header' 'aside main'"
+	classes={{ root: $useBg ? "bg_enabled" : "" }}
+	--bgUrl={$useBg}
 >
 	<svelte:fragment slot="nav">
 		<!-- Nav menu -->
 	</svelte:fragment>
-	<AppBar
-		title="Personal Dictionary"
-		class="bg-primary text-primary-content"
-	>
-		<Icon slot="menuIcon" data={AppIcon} width="auto" height="4em"/>
+	<AppBar title="Personal Dictionary" class="bg-primary text-primary-content">
+		<Icon slot="menuIcon" data={AppIcon} width="auto" height="4em" />
 		<div slot="actions" class="flex items-center">
 			<div class="mr-auto"></div>
 			<TextField
@@ -66,7 +68,7 @@
 				}}
 				bind:value={searchTerm}
 			>
-				<Icon slot="prepend" data={SearchIcon}/>
+				<Icon slot="prepend" data={SearchIcon} />
 			</TextField>
 			<!-- App actions, goes at the end -->
 			<Button
@@ -100,7 +102,7 @@
 			{/each}
 		</ListBox> -->
 		<div class="max-w-[100vw] px-8 lg:px-24 pt-0">
-			<TabularView searchTerm={searchTerm} />
+			<TabularView {searchTerm} />
 		</div>
 	</main>
 </AppLayout>
@@ -118,5 +120,5 @@
 
 	.root-app-layout {
 		--drawerWidth: 0px;
-	}	
+	}
 </style>

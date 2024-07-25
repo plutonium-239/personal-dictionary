@@ -20,6 +20,6 @@ export let editMode = writable(false)
 export let isDark = writable(true)
 
 // Persisted:
-export let separator = localStore("separator", " ")
+export let separator = localStore("separator", "\n")
 
-export let useBg = localStore("useBg", false)
+export let useBg = localStore("useBg", "")
