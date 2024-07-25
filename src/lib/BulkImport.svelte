@@ -99,7 +99,7 @@
 			class="flex w-full justify-between items-center"
 		>
 			Import a list of words
-			<div class="inline-flex gap-2 flex-col md:flex-row justify-center outline-offset-8 outline outline-1 outline-accent/10">
+			<div class="inline-flex gap-2 flex-col md:flex-row items-center outline-offset-8 outline outline-1 outline-accent/10">
 				<label for="separator_choice" class="text-accent font-normal">
 					Separator:
 				</label>
@@ -111,10 +111,10 @@
 					class="font-mono"
 					on:change={() => parseMultiple(formatList(inputText))}
 				>
-					<ToggleOption value=",">,</ToggleOption>
-					<ToggleOption value={`\n`}>\n</ToggleOption>
-					<ToggleOption value={`\r\n`}>\r\n</ToggleOption>
-					<ToggleOption value=" ">(space)</ToggleOption>
+					<ToggleOption classes={{option: "py-2 !mt-0"}} value=",">,</ToggleOption>
+					<ToggleOption classes={{option: "py-2 !mt-0"}} value={`\n`}>\n</ToggleOption>
+					<ToggleOption classes={{option: "py-2 !mt-0"}} value={`\r\n`}>\r\n</ToggleOption>
+					<ToggleOption classes={{option: "py-2 !mt-0"}} value=" ">(space)</ToggleOption>
 				</ToggleGroup>
 			</div>
 		</div>
@@ -131,8 +131,8 @@
 			<Button variant="fill-light" color="primary">Close</Button>
 		</div>
 		<ToggleGroup variant="underline" rounded value="input">
-			<ToggleOption value="input">Input</ToggleOption>
-			<ToggleOption value="output">Output</ToggleOption>
+			<ToggleOption classes={{option: "py-1 !mt-1"}} value="input">Input</ToggleOption>
+			<ToggleOption classes={{option: "py-1 !mt-1"}} value="output">Output</ToggleOption>
 			<svelte:fragment slot="panes">
 				<TogglePanel>
 					<TextField

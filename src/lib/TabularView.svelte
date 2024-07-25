@@ -7,7 +7,7 @@
 	import { data } from "./store"
 	import Actions from "./table-elements/Actions.svelte"
 	import { search20, loadWordList } from "./load_wordlist"
-	import { Button, debounceEvent, ListItem, sticky, TextField, ThemeInit } from "svelte-ux"
+	import { Button, ListItem, TextField } from "svelte-ux"
 	import Word from "./table-elements/Word.svelte"
 	import Synonyms from "./table-elements/Synonyms.svelte"
 	import BulkImport from "./BulkImport.svelte"
@@ -24,8 +24,8 @@
 	const columns = table.createColumns([
 		table.column({
 			header: "Word",
-			accessor: "word",
-			cell: ({ value }) => createRender(Word, { wordString: value }),
+			accessor: (item) => item,
+			cell: ({ value }) => createRender(Word, { word: value }),
 		}),
 		table.column({
 			header: "POS",
@@ -83,15 +83,16 @@
 	let hintNode: HTMLDivElement
 	let hintHeight: number = 38
 	let textField: TextField
+	let innerWidth: number = 1000
+
 	$: hintHeight = hintNode?.clientHeight
 
 	$: if (!newWord) completionSelected = false
-	
 </script>
 
-<ThemeInit />
-
-<div class="pt-8 flex justify-center items-stretch gap-2 bg-surface-200">
+<!-- <ThemeInit /> -->
+<svelte:window bind:innerWidth />
+<div class="pt-8 flex max-md:flex-wrap justify-center items-stretch gap-2 bg-surface-200">
 	<TextField
 		bind:this={textField}
 		placeholder="Enter a new word"
@@ -158,7 +159,6 @@ class="m-2 mb-6 overflow-y-auto text-center
 	{/await}
 </div>
 
-<!-- TODO: Combine Word,POS columns when small (maybe using grid layout option?) -->
 <div class="pb-6 w-full">
 	<table {...$tableAttrs} class="w-full">
 		<thead>
@@ -167,14 +167,18 @@ class="m-2 mb-6 overflow-y-auto text-center
 					<tr {...rowAttrs}>
 						{#each headerRow.cells as cell (cell.id)}
 							<Subscribe attrs={cell.attrs()} let:attrs>
-								{@const synclass =
+								{@const synclass = cell.label === "Synonyms" ? 
+									"hidden lg:table-cell" : ""}
+								{@const posclass = cell.label === "POS" ? 
+									"hidden md:table-cell" : ""}
+								<!-- {@const synclass =
 									cell.label === "Synonyms"
 										? "hidden lg:table-cell"
-										: ""}
+										: ""} -->
 								<th
 									{...attrs}
 									class={"border-y p-2 border-solid border-secondary-900 " +
-										synclass}
+										synclass + posclass}
 								>
 									<Render of={cell.render()} />
 								</th>
@@ -195,14 +199,14 @@ class="m-2 mb-6 overflow-y-auto text-center
 								props={cell.props()}
 								let:props
 							>
-								{@const synclass =
-									cell.column.header === "Synonyms"
-										? "hidden lg:table-cell"
-										: ""}
+								{@const synclass = cell.column.header === "Synonyms" ? 
+									"hidden lg:table-cell" : ""}
+								{@const posclass = cell.column.header === "POS" ? 
+									"hidden md:table-cell" : ""}
 								<td
 									{...attrs}
 									class={"border-b p-2 border-solid border-secondary-900 " +
-										synclass}
+										synclass + posclass}
 									class:matches={props.tableFilter.matches}
 								>
 									<Render of={cell.render()} />
