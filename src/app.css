@@ -62,9 +62,12 @@ header.AppBar > .grid {
   url("/font_mtf-be-mine/mtf-be-mine.svg#MTF Be Mine")format("svg");
 }
 
-header.AppBar > .Icon + div {
+.cute {
   font-family: "MTF Be Mine";
-  @apply text-3xl md:text-5xl small-header ;
+}
+
+header.AppBar > .Icon + div {
+  @apply cute text-3xl md:text-5xl small-header ;
   /* font-size: xxx-large; */
 }
 .small-header {
