@@ -101,7 +101,7 @@
 		if (params.has("sharedWords")) shared = params.get("sharedWords")!
 
 		inputText = shared
-		$sepIndex = 1 // \n
+		$sepIndex = 3 // space
 		open = true
 	}
 	$: textareaHeight = calcH(
