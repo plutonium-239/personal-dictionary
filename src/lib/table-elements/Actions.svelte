@@ -76,7 +76,7 @@
 
 </div>
 
-<style>
+<style type="text/postcss">
 	@media screen(md) {
 		.actions-container {
 			/* display: inline-grid; */

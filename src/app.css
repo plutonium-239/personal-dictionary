@@ -7,8 +7,8 @@ html {
 }
 
 .bg_enabled {
-  background-image: url("/cuteicon_fullbg.svg");
-  min-height: 100vh;
+  background-image: var(--bgUrl);
+  min-height: calc(100vh - var(--headerHeight));
   background-attachment: fixed;
   background-repeat: no-repeat;
   background-size: contain;
@@ -62,9 +62,12 @@ header.AppBar > .grid {
   url("/font_mtf-be-mine/mtf-be-mine.svg#MTF Be Mine")format("svg");
 }
 
-header.AppBar > .Icon + div {
+.cute {
   font-family: "MTF Be Mine";
-  @apply text-3xl md:text-5xl small-header ;
+}
+
+header.AppBar > .Icon + div {
+  @apply cute text-3xl md:text-5xl small-header ;
   /* font-size: xxx-large; */
 }
 .small-header {

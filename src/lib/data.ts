@@ -149,7 +149,7 @@ export function updateMeanings(word: WordData) {
 			return word
 		})
 		.catch((err) => {
-			console.error(`${word}: ${err}`)
+			console.error(`${word.word}: ${err}`)
 			return word
 		})
 }

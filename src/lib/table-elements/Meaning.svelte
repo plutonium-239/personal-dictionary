@@ -27,7 +27,9 @@
 	}}
 >
 	<div slot="title" class="text-secondary flex w-100 justify-between">
-		All definitions for {word.word}
+		<div>
+			All definitions for <span class="bg-secondary/50 text-primary rounded p-1">{word.word}</span>
+		</div>
 		<Button
 			variant="fill"
 			color="primary"
