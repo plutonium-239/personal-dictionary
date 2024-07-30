@@ -10,9 +10,11 @@
 
 <div class="text-center font-bold text-accent-900 dark:text-accent-50">
 	<div>{word.word}</div>
+	{#if word.fetched}
 	<span
 		class="pos px-2 rounded font-mono font-bold italic text-primary-content bg-primary md:hidden"
 	>
 		{partOfSpeech.slice(0, 4)}
 	</span>
+	{/if}
 </div>
