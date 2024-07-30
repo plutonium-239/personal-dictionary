@@ -57,7 +57,6 @@
 			>
 		</ToggleGroup>
 
-		<!-- TODO: Add sharing stuff -->
 		<!-- <Tooltip title="This will ">
 			<span>share</span>
 		</Tooltip>

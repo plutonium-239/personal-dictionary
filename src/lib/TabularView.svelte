@@ -21,6 +21,7 @@
 	// Make it reactive so that new entries show up instantly
 	$data
 
+	// TODO: Add sorting
 	const columns = table.createColumns([
 		table.column({
 			header: "Word",
