@@ -10,6 +10,7 @@
 		Tooltip,
 	} from "svelte-ux"
 	import listAddIcon from "./icons/list-add.svg?raw"
+	import refreshIcon from "./icons/refresh-cw-alt.svg?raw"
 	import { data, isDark, customSeparator, sepIndex } from "./store"
 	import { updateMeanings, WordData } from "./data"
 	import pThrottle from "p-throttle"
@@ -23,13 +24,14 @@
 	// let separator: string = " "
 	let parsedData: WordData[] = []
 	let loadingDone: boolean[] = []
+	let loading: boolean = false
 	let errorText: string = ""
 	let parsingState: keyof typeof errorStateColors = "info"
 
 	const definedSeps = [
 		{label: ",", raw: ","},
-		{label: String.raw`\n`, raw: String.raw`\n`},
-		{label: String.raw`\r\n`, raw: String.raw`\r\n`},
+		{label: String.raw`\n`, raw: `\n`},
+		{label: String.raw`\r\n`, raw: `\r\n`},
 		{label: "(space)", raw: " "},
 		{label: `Custom (${$customSeparator})`, raw: ""},
 	]
@@ -64,6 +66,12 @@
 				loadingDone[i] = true
 			})()
 		})
+		let timer = setInterval(() => {
+			if (loadingDone.every((v) => v)) {
+				loading = false
+				clearInterval(timer)
+			}
+		}, 500)
 		// (async () => {await Promise.all(promises)})();
 	}
 	function addParsed() {
@@ -74,18 +82,25 @@
 	}
 
 	function formatList(text: string): string[] {
+		loading = true
+		let timer = setTimeout(() => {
+			loading = false
+		}, 100);
 		let sep = definedSeps[$sepIndex].raw
 		if (!text || !sep) return []
-		let list = text.split(sep)
+		let list = text.split(`${sep}`)
 		console.log({ sep: sep, t: text })
 		console.log(list)
 
 		if (list.length == 1) {
-			errorText = String.raw`Separating with ${$sepIndex} only gave 1 length array`
+			errorText = String.raw`Separating with ${definedSeps[$sepIndex].label} only gave 1 length array`
 			parsingState = "error"
 			return list
 		}
+		clearTimeout(timer)
+		loading = true
 		parsingState = "success"
+		errorText = `Got ${list.length} words separated by ${definedSeps[$sepIndex].label}!`
 		return list
 	}
 	// $: console.log(titleNode?.parentElement!.clientHeight)
@@ -100,9 +115,10 @@
 		let shared: string = ""
 		if (params.has("sharedWords")) shared = params.get("sharedWords")!
 
+		open = true
 		inputText = shared
 		$sepIndex = 3 // space
-		open = true
+		parseMultiple(formatList(inputText))
 	}
 	$: textareaHeight = calcH(
 		innerHeight,
@@ -180,14 +196,25 @@
 
 		<div slot="actions" bind:this={actionsNode} class="w-full px-4 gap-2 flex justify-end items-center">
 			<div class="font-mono text-center content-center px-2 mr-auto
-			h-full rounded whitespace-pre {errorStateColors[parsingState]}">
+			h-full rounded whitespace-break-spaces {errorStateColors[parsingState]}">
 				{">"}
 				{#if errorText}
 					{errorText}
 				{:else}
-					Errors will be shown here.
+						Errors will be shown here.
 				{/if}
 			</div>
+			<Button
+				variant="default"
+				color="primary"
+				icon={refreshIcon}
+				{loading}
+				disabled={loading}
+				on:click={(e) => {
+					e.stopPropagation()
+					parseMultiple(formatList(inputText))
+				}}
+			/>
 			<Button
 				variant="fill"
 				color="success"
