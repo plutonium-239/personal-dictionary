@@ -1,21 +1,4 @@
-<style>
-    @font-face {
-        font-family: "MTF Be Mine";
-        src: url("https://personal-dictionary.pages.dev/font_mtf-be-mine/mtf-be-mine.eot");
-        src: url("https://personal-dictionary.pages.dev/font_mtf-be-mine/mtf-be-mine.eot?#iefix")format("embedded-opentype"),
-        url("https://personal-dictionary.pages.dev/font_mtf-be-mine/mtf-be-mine.woff2")format("woff2"),
-        url("https://personal-dictionary.pages.dev/font_mtf-be-mine/mtf-be-mine.woff")format("woff"),
-        url("https://personal-dictionary.pages.dev/font_mtf-be-mine/mtf-be-mine.ttf")format("truetype"),
-        url("https://personal-dictionary.pages.dev/font_mtf-be-mine/mtf-be-mine.svg#MTF Be Mine")format("svg");
-    }
-
-    .cute {
-        font-family: "MTF Be Mine";
-        font-size: xx-large;
-    }
-</style>
-
-# Personal Dictionary
+# ![Personal Dictionary](banner.png)
 
 This app lets you add your own words, and automatically gets their definitions, synonyms, antonyms and examples from the internet.
 
@@ -37,8 +20,6 @@ It uses the [Dictionary API](https://dictionaryapi.dev/) to get meanings (which 
 The autocompletion wordlist is taken from the [dwyl/english-words](https://github.com/dwyl/english-words/) repo. I have also considered the aspell word lists but they have a lot of repitition (in the sense that almost every word has it's variant with an `'s` right after it, which is pointless for a dictionary).
 
 For fuzzy search, the [EthanRutherford/fast-fuzzy](https://github.com/EthanRutherford/fast-fuzzy/) library is utilized which works quite well.
-
-<span class="cute">Be Mine</span>: 
 
 I use the [mtf be mine](https://misstiina.com/fonts/mtf-be-mine/) font, which is the cutest font ever. It is [free for non-profit use](https://misstiina.com/fonts/tou/), and this is an open source project.
 
