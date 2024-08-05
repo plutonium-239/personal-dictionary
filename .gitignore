@@ -27,3 +27,5 @@ dist-ssr
 !.idx/dev.nix
 
 *.txt
+
+MapleMono*
