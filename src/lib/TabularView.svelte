@@ -1,59 +1,80 @@
 <script lang="ts">
 	import { createTable, Subscribe, Render, createRender } from "svelte-headless-table"
-	import { addTableFilter } from "svelte-headless-table/plugins"
+	import { addHiddenColumns, addSortBy, addTableFilter } from "svelte-headless-table/plugins"
 	import { WordData, totalWords, updateMeanings } from "./data"
 	import Meaning from "./table-elements/Meaning.svelte"
 	import POS from "./table-elements/POS.svelte"
-	import { data } from "./store"
+	import { data, sortToggleOrder, sortKey, sortOrder } from "./store"
 	import Actions from "./table-elements/Actions.svelte"
 	import { search20, loadWordList } from "./load_wordlist"
-	import { Button, ListItem, TextField } from "svelte-ux"
+	import { Button, Icon, ListItem, TextField } from "svelte-ux"
 	import Word from "./table-elements/Word.svelte"
 	import Synonyms from "./table-elements/Synonyms.svelte"
 	import BulkImport from "./BulkImport.svelte"
 	import AddIcon from "./icons/add-circle.svg?raw"
+	import ArrowUpIcon from "./icons/arrow-up.svg?raw"
+	import ArrowDownIcon from "./icons/arrow-down.svg?raw"
 
 	export let searchTerm: string
 
 	const table = createTable(data, {
 		tableFilter: addTableFilter(),
+		sort: addSortBy(),
+		hide: addHiddenColumns( { initialHiddenColumnIds: ["dateAdded"] } ),
 	})
 	// Make it reactive so that new entries show up instantly
 	$data
 
-	// TODO: Add sorting
 	const columns = table.createColumns([
 		table.column({
 			header: "Word",
 			accessor: (item) => item,
 			cell: ({ value }) => createRender(Word, { word: value }),
+			plugins: { sort: { getSortValue: (item) => item.word, } },
 		}),
 		table.column({
 			header: "POS",
 			accessor: (item) => item,
 			cell: ({ value }) => createRender(POS, { word: value }),
+			plugins: { sort: { 
+				getSortValue: (item) => 
+				item.fetched? item.meanings.partOfSpeech[item.selectedDefinition] : "", 
+			} },
 		}),
 		table.column({
 			header: "Meaning",
 			accessor: (item) => item,
 			cell: ({ value }) => createRender(Meaning, { word: value }),
+			plugins: { sort: { disable: true, } },
 		}),
 		table.column({
 			header: "Synonyms",
 			accessor: (item) => item,
 			cell: ({ value }) => createRender(Synonyms, { word: value }),
+			plugins: { sort: { disable: true, } },
 		}),
 		table.column({
 			header: "Actions",
 			accessor: (item) => item,
 			cell: ({ value }) => createRender(Actions, { word: value }),
+			plugins: { sort: { disable: true, } },
 		}),
+		table.column({
+			header: "Date",
+			accessor: "dateAdded",
+		})
 	])
 
 	const { headerRows, rows, tableAttrs, tableBodyAttrs, pluginStates } =
 		table.createViewModel(columns)
 	const { filterValue } = pluginStates.tableFilter
+	const  { sortKeys } = pluginStates.sort
 	$: $filterValue = searchTerm !== null ? searchTerm : ""
+	$: if ($sortToggleOrder) {
+		sortKeys.toggleId($sortKey, { multiSort: false })
+		$sortOrder = $sortKeys[0]?.order
+	} 
+	
 
 	let newWord: string = ""
 	let completionSelected: boolean = false
@@ -164,10 +185,10 @@ class="m-2 mb-6 overflow-y-auto text-center
 	<table {...$tableAttrs} class="w-full">
 		<thead>
 			{#each $headerRows as headerRow (headerRow.id)}
-				<Subscribe rowAttrs={headerRow.attrs()} let:rowAttrs>
+				<Subscribe rowAttrs={headerRow.attrs()} let:rowAttrs rowProps={headerRow.props()} let:rowProps>
 					<tr {...rowAttrs}>
 						{#each headerRow.cells as cell (cell.id)}
-							<Subscribe attrs={cell.attrs()} let:attrs>
+							<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 								{@const synclass = cell.label === "Synonyms" ? 
 									"hidden lg:table-cell" : ""}
 								{@const posclass = cell.label === "POS" ? 
@@ -177,11 +198,16 @@ class="m-2 mb-6 overflow-y-auto text-center
 										? "hidden lg:table-cell"
 										: ""} -->
 								<th
-									{...attrs}
+									{...attrs} on:click={props.sort.toggle}
 									class={"border-y p-2 border-solid border-secondary-900 " +
 										synclass + posclass}
 								>
 									<Render of={cell.render()} />
+									{#if props.sort.order === 'asc'}
+									<Icon data={ArrowUpIcon}/>
+									{:else if props.sort.order === 'desc'}
+									<Icon data={ArrowDownIcon}/>
+									{/if}
 								</th>
 							</Subscribe>
 						{/each}

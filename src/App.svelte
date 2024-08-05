@@ -9,12 +9,13 @@
 	const { currentTheme, themes, showDrawer } = getSettings()
 
 	import TabularView from "./lib/TabularView.svelte"
-	import { editMode, isDark, useBg } from "./lib/store"
+	import { editMode, isDark, sortToggleOrder, useBg } from "./lib/store"
 	import { ThemeSelect, AppLayout, ThemeInit } from "svelte-ux"
 	import DeleteIcon from "./lib/icons/delete-2.svg?raw"
 	import SearchIcon from "./lib/icons/search.svg?raw"
 	import AppIcon from "./assets/cuteicon_full.svg?raw"
 	import Settings from "./lib/Settings.svelte"
+	import SortView from "./lib/Sort.svelte"
 
 	const skeletonthemes = [
 		{ label: "Skeleton", value: "skeleton" },
@@ -71,6 +72,7 @@
 				>
 				<Icon slot="prepend" data={SearchIcon} />
 			</TextField>
+			<SortView/>
 			<!-- App actions, goes at the end -->
 			<Button
 				variant="fill"
