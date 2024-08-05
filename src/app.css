@@ -62,6 +62,31 @@ header.AppBar > .grid {
   url("/font_mtf-be-mine/mtf-be-mine.svg#MTF Be Mine")format("svg");
 }
 
+@font-face {
+  font-family: "Maple Mono";
+  src: url("/font_Maple_Mono/MapleMono-Regular.woff2")format("woff2"),
+  url("/font_Maple_Mono/MapleMono-Regular.ttf")format("truetype");
+}
+@font-face {
+  font-family: "Maple Mono";
+  font-style: italic;
+  src: url("/font_Maple_Mono/MapleMono-Italic.woff2")format("woff2"),
+  url("/font_Maple_Mono/MapleMono-Italic.ttf")format("truetype");
+}
+@font-face {
+  font-family: "Maple Mono";
+  font-weight: bold;
+  src: url("/font_Maple_Mono/MapleMono-Bold.woff2")format("woff2"),
+  url("/font_Maple_Mono/MapleMono-Bold.ttf")format("truetype");
+}
+@font-face {
+  font-family: "Maple Mono";
+  font-weight: bold;
+  font-style: italic;
+  src: url("/font_Maple_Mono/MapleMono-BoldItalic.woff2")format("woff2"),
+  url("/font_Maple_Mono/MapleMono-BoldItalic.ttf")format("truetype");
+}
+
 .cute {
   font-family: "MTF Be Mine";
 }

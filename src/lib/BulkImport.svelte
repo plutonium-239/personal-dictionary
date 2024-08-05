@@ -141,6 +141,7 @@
 		color="secondary"
 		rounded
 		icon={listAddIcon}
+		class="font-bold"
 	>
 		Import words
 	</Button>

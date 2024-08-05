@@ -3,6 +3,7 @@
 	import SettingsIcon from "./icons/settings.svg?raw"
 	import CopyIcon from "./icons/copy-1.svg?raw"
 	import DownloadIcon from "./icons/download-file-1.svg?raw"
+	import InfoIcon from "./icons/info.svg?raw"
 	import { useBg, data } from "./store"
 
 	let open: boolean = false
@@ -62,11 +63,14 @@
 		</Tooltip>
 		<Button variant="fill" color="primary">copy shareable link</Button> -->
 
-		<Tooltip title='This will copy to your clipboard. 
+		<!-- <Tooltip title='This will copy to your clipboard. 
 		Paste these in the import words dialog.'
-		classes={{title: "whitespace-pre-line"}}>
-			<span>export</span>
-		</Tooltip>
+		classes={{title: "whitespace-pre-line"}}> -->
+			<span>
+				export
+				<!-- <Icon data={InfoIcon} class="cursor-help"/> -->
+			</span>
+		<!-- </Tooltip> -->
 		<ButtonGroup variant="fill" color="primary" class="inline-flex flex-wrap">
 			<Button class="flex-1" icon={CopyIcon} on:click={copyButtonClick}>
 				link

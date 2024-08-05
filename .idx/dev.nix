@@ -13,7 +13,13 @@
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
-      "svelte.svelte-vscode"
+      # "svelte.svelte-vscode"
+      "unthrottled.doki-theme"
+      "fabiospampinato.vscode-highlight"
+      "atomiks.moonlight"
+      "sndst00m.vscode-native-svg-preview"
+      "bpat86.nightcall"
+      "wildberries-theme.wildberries"
     ];
     workspace = {
       # Runs when a workspace is first created with this `dev.nix` file

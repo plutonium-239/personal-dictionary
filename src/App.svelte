@@ -54,6 +54,8 @@
 		<Icon slot="menuIcon" data={AppIcon} width="auto" height="4em" />
 		<div slot="actions" class="flex items-center">
 			<div class="mr-auto"></div>
+			<div class="contents">
+
 			<TextField
 				label="Search your dictionary"
 				labelPlacement="float"
@@ -61,12 +63,12 @@
 				class="lg:w-[40%]"
 				classes={{
 					container:
-						"p-2 border-none bg-surface-100/10 group-focus-within:bg-surface-100/50 group-hover:bg-surface-100/35",
+					"p-2 border-none bg-surface-100/10 group-focus-within:bg-surface-100/50 group-hover:bg-surface-100/35",
 					input: "text-secondary group-hover:[display:unset] max-lg:hidden",
-					label: "group-hover:flex hidden lg:flex text-primary-content group-hover:text-primary-content",
+					label: "font-medium group-hover:flex hidden lg:flex text-primary-content group-hover:text-primary-content",
 				}}
 				bind:value={searchTerm}
-			>
+				>
 				<Icon slot="prepend" data={SearchIcon} />
 			</TextField>
 			<!-- App actions, goes at the end -->
@@ -79,12 +81,13 @@
 					$editMode = !$editMode
 				}}
 			>
-				<span class="max-md:hidden">Edit Mode</span>
+				<span class="max-md:hidden font-bold">Edit Mode</span>
 			</Button>
 			<Settings />
 			<div class="mx-4 bg-info/50 rounded-full self-center theme-selector-parent">
 				<ThemeSelect />
 			</div>
+		</div>
 		</div>
 	</AppBar>
 	<main class="flex flex-col">

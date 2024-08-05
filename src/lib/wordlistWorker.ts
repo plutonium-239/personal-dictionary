@@ -2,8 +2,9 @@ import { Searcher } from "fast-fuzzy";
 import wordListUrl from "../assets/words_alpha.txt";
 
 let words: string[]
-
 async function getListAndSplit() {
+    // TODO: fetch and save in indexedDB
+    // TODO ..is it really needed since cache works? 
     const file = await fetch(wordListUrl)
     const filecontent = await file.text()
     // console.log("Worker:")

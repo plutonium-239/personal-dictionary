@@ -113,14 +113,14 @@
 	>
 		<svelte:fragment slot="append">
 			<Button 
-				variant="fill-light"
+				variant="default"
 				color="primary"
 				icon={AddIcon}
 				on:click={handleInputEnter}
 				disabled={!newWord}
-				class="max-md:px-2"
+				class="max-md:px-2 font-bold"
 			>
-				<span class="max-md:hidden">Add</span>
+				Add
 			</Button>
 		</svelte:fragment>
 	</TextField>

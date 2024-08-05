@@ -106,7 +106,7 @@ percentage=true
 					on:click={() => select(def.index)}
 				>
 					<!-- <ExpansionPanel class="mx-4" disabled={def.example === ""}> -->
-					<div class="card-header font-bold pb-4">
+					<div class="card-header pb-4 font-semibold">
 						{def.def.definition}
 					</div>
 					{#if def.def.example !== ""}

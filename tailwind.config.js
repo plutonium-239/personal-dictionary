@@ -2,6 +2,7 @@ const colors = require("tailwindcss/colors")
 const svelteUx = require("svelte-ux/plugins/tailwind.cjs")
 import { join } from 'path';
 import { skeleton } from '@skeletonlabs/tw-plugin';
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
 	content: [
@@ -19,6 +20,10 @@ module.exports = {
 	},
 	theme: {
 		extend: {},
+		fontFamily: {
+			sans: ['Quicksand', ...defaultTheme.fontFamily.sans],
+			mono: ['Maple Mono', ...defaultTheme.fontFamily.mono]
+		}
 	},
 
 	plugins: [
